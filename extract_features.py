@@ -79,54 +79,75 @@ def calculate_perplexity(text):
 def calculate_grammar_errors(text):
     if not isinstance(text, str) or len(text.strip()) == 0:
         return 0.0
-    words = len(text.split())
-    if words == 0:
+    # Truncate text to 1,500 chars for grammar check to prevent LanguageTool server lockups on huge emails
+    sample_text = text[:1500]
+    sample_words = len(sample_text.split())
+    if sample_words == 0:
         return 0.0
-    matches = lang_tool.check(text)
-    # Errors per 100 words
-    return (len(matches) / words) * 100
+    try:
+        matches = lang_tool.check(sample_text)
+        # Errors per 100 words
+        return (len(matches) / sample_words) * 100
+    except Exception:
+        # If LanguageTool local server hangs or has an error on messy/malformed text, fallback gracefully
+        return 0.0
 
 def extract_features(text):
-    if not isinstance(text, str):
-        text = ""
-    
-    # Truncate extremely long anomalous emails to 10,000 characters to prevent Spacy memory exhaustion
-    # DistilBERT only supports 512 tokens (~2000 chars) anyway.
-    if len(text) > 10000:
-        text = text[:10000]
+    try:
+        if not isinstance(text, str):
+            text = ""
         
-    text_lower = text.lower()
-    doc = nlp(text)
-    
-    # 1. Message Length (Words)
-    word_count = len(text.split())
-    
-    # 2. Perplexity
-    perplexity = calculate_perplexity(text)
-    
-    # 3. Grammar Consistency
-    grammar_errors = calculate_grammar_errors(text)
-    
-    # 4. Urgency Lexicon
-    urgency_count = sum(len(re.findall(kw, text_lower)) for kw in URGENCY_KEYWORDS)
-    
-    # 5. Fear Appeals
-    fear_count = sum(len(re.findall(kw, text_lower)) for kw in FEAR_KEYWORDS)
-    
-    # 6. Authority Impersonation
-    # Count org entities from Spacy + regex for job titles
-    org_entities = sum(1 for ent in doc.ents if ent.label_ == "ORG")
-    title_count = sum(len(re.findall(kw, text_lower)) for kw in AUTHORITY_TITLES)
-    authority_score = org_entities + title_count
-    
-    return {
-        'perplexity': perplexity,
-        'grammar_errors': grammar_errors,
-        'word_count': word_count,
-        'urgency_score': urgency_count,
-        'fear_score': fear_count,
-        'authority_score': authority_score
-    }
+        # Truncate extremely long anomalous emails to 10,000 characters
+        if len(text) > 10000:
+            text = text[:10000]
+            
+        text_lower = text.lower()
+        
+        # 1. Message Length (Words)
+        word_count = len(text.split())
+        
+        # 2. Perplexity
+        try:
+            perplexity = calculate_perplexity(text)
+        except Exception:
+            perplexity = 0.0
+        
+        # 3. Grammar Consistency
+        grammar_errors = calculate_grammar_errors(text)
+        
+        # 4. Urgency Lexicon
+        urgency_count = sum(len(re.findall(kw, text_lower)) for kw in URGENCY_KEYWORDS)
+        
+        # 5. Fear Appeals
+        fear_count = sum(len(re.findall(kw, text_lower)) for kw in FEAR_KEYWORDS)
+        
+        # 6. Authority Impersonation
+        try:
+            doc = nlp(text[:3000]) # Spacy entity check on first 3000 chars
+            org_entities = sum(1 for ent in doc.ents if ent.label_ == "ORG")
+        except Exception:
+            org_entities = 0
+            
+        title_count = sum(len(re.findall(kw, text_lower)) for kw in AUTHORITY_TITLES)
+        authority_score = org_entities + title_count
+        
+        return {
+            'perplexity': perplexity,
+            'grammar_errors': grammar_errors,
+            'word_count': word_count,
+            'urgency_score': urgency_count,
+            'fear_score': fear_count,
+            'authority_score': authority_score
+        }
+    except Exception:
+        return {
+            'perplexity': 0.0,
+            'grammar_errors': 0.0,
+            'word_count': 0,
+            'urgency_score': 0,
+            'fear_score': 0,
+            'authority_score': 0
+        }
 
 from concurrent.futures import ThreadPoolExecutor
 
@@ -134,9 +155,8 @@ def process_file(filepath):
     print(f"Processing {filepath}...")
     df = pd.read_csv(filepath)
     
-    with ThreadPoolExecutor(max_workers=16) as executor:
-        # We use executor.map to parallelize the extraction
-        # LanguageTool is heavily IO-bound (HTTP requests), so 16 threads will speed this up by 10-15x!
+    # Colab free tier has 2 CPU cores. 4 worker threads is optimal and avoids overloading the local Java server
+    with ThreadPoolExecutor(max_workers=4) as executor:
         features_list = list(tqdm(executor.map(extract_features, df['text']), total=len(df), desc="Extracting features"))
         
     features_df = pd.DataFrame(features_list)
