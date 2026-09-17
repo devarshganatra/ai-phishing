@@ -1,0 +1,11 @@
+torch
+transformers
+pandas
+scikit-learn
+spacy
+language-tool-python
+groq
+imbalanced-learn
+matplotlib
+seaborn
+tqdm

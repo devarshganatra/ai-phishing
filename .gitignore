@@ -1,0 +1,14 @@
+# Environments
+.env
+venv/
+env/
+__pycache__/
+*.pyc
+
+# IDEs
+.vscode/
+.idea/
+.gemini/
+
+# Large raw datasets (optional, but good practice to ignore the 50MB raw file)
+Phishing_Email.csv
