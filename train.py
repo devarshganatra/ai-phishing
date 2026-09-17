@@ -4,7 +4,8 @@ import pandas as pd
 import numpy as np
 from torch.utils.data import Dataset, DataLoader
 from transformers import DistilBertTokenizerFast
-from sklearn.metrics import accuracy_score, precision_recall_f1_score_support, roc_auc_score
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support, roc_auc_score
+from sklearn.preprocessing import StandardScaler
 from model import PhishingDistilBERT
 from tqdm import tqdm
 
@@ -21,6 +22,14 @@ class PhishingDataset(Dataset):
         for col in feature_cols:
             if col in self.df.columns:
                 self.df[col] = self.df[col].fillna(0)
+
+        # Normalize handcrafted features to zero-mean unit-variance.
+        # Without this, perplexity (0-10000) would totally dominate word_count (0-500)
+        # and the other small features, breaking the model.
+        available = [c for c in feature_cols if c in self.df.columns]
+        if available:
+            scaler = StandardScaler()
+            self.df[available] = scaler.fit_transform(self.df[available])
 
     def __len__(self):
         return len(self.df)
@@ -89,6 +98,9 @@ def train_model(variant, train_loader, val_loader, device, epochs=3):
             loss = criterion(logits, labels)
             
             loss.backward()
+            # Gradient clipping is critical for stable BERT fine-tuning;
+            # without it, large gradients can corrupt the pre-trained weights.
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()
             total_loss += loss.item()
             
@@ -108,13 +120,13 @@ def train_model(variant, train_loader, val_loader, device, epochs=3):
                     extra_features = extra_features.to(device)
                     
                 logits = model(input_ids, attention_mask, extra_features)
-                preds = torch.sigmoid(logits).round().cpu().numpy()
+                preds = torch.sigmoid(logits).round().cpu().numpy().flatten()
                 
                 val_preds.extend(preds)
-                val_labels.extend(labels.cpu().numpy())
+                val_labels.extend(labels.cpu().numpy().flatten())
                 
         # Metrics
-        precision, recall, f1, _ = precision_recall_f1_score_support(val_labels, val_preds, average='binary')
+        precision, recall, f1, _ = precision_recall_fscore_support(val_labels, val_preds, average='binary')
         print(f"Epoch {epoch+1} | Loss: {avg_train_loss:.4f} | Val F1: {f1:.4f} | Precision: {precision:.4f} | Recall: {recall:.4f}")
         
         if f1 > best_f1:
