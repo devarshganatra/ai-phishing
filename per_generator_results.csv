@@ -1,0 +1,5 @@
+Generator / Source,N,Baseline (%),Behavioral (%),Psychological (%),Full (%)
+allam-2-7b,367,75.75%,88.28%,75.75%,73.84%
+groq/compound,144,6.25%,6.94%,6.25%,5.56%
+qwen/qwen3.8-27b,2,100.00%,100.00%,50.00%,100.00%
+OVERALL,513,56.34%,65.50%,56.14%,54.78%

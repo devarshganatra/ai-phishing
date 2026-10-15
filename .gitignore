@@ -10,5 +10,9 @@ __pycache__/
 .idea/
 .gemini/
 
-# Large raw datasets (optional, but good practice to ignore the 50MB raw file)
-
+# Model checkpoints and archives (exceed GitHub's limits / binary dumps)
+saved_models/
+*.pt
+*.bin
+*.safetensors
+*.zip
