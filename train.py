@@ -1,4 +1,5 @@
 import os
+import random
 import torch
 import pandas as pd
 import numpy as np
@@ -8,6 +9,29 @@ from sklearn.metrics import accuracy_score, precision_recall_fscore_support, roc
 from sklearn.preprocessing import StandardScaler
 from model import PhishingDistilBERT
 from tqdm import tqdm
+
+
+def set_seed(seed):
+    """Seed every RNG so a run is reproducible and seed-to-seed variance is measurable."""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+
+# Feature columns used by each model variant. Single-feature variants (perplexity, grammar,
+# length) let the ablation attribute any gain to one feature instead of the three-feature block.
+VARIANT_FEATURES = {
+    'baseline': [],
+    'perplexity': ['perplexity'],
+    'grammar': ['grammar_errors'],
+    'length': ['word_count'],
+    'behavioral': ['perplexity', 'grammar_errors', 'word_count'],
+    'psychological': ['urgency_score', 'authority_score', 'fear_score'],
+    'full': ['perplexity', 'grammar_errors', 'word_count', 'urgency_score', 'authority_score', 'fear_score'],
+}
 
 class PhishingDataset(Dataset):
     def __init__(self, csv_file, tokenizer, max_length=512, variant='baseline', scaler=None):
@@ -49,28 +73,17 @@ class PhishingDataset(Dataset):
             'label': torch.tensor(label, dtype=torch.float)
         }
         
-        if self.variant == 'behavioral':
-            features = self.df.iloc[idx][['perplexity', 'grammar_errors', 'word_count']].values.astype(np.float32)
+        cols = VARIANT_FEATURES.get(self.variant, [])
+        if cols:
+            features = self.df.iloc[idx][cols].values.astype(np.float32)
             item['extra_features'] = torch.tensor(features)
-        elif self.variant == 'psychological':
-            features = self.df.iloc[idx][['urgency_score', 'authority_score', 'fear_score']].values.astype(np.float32)
-            item['extra_features'] = torch.tensor(features)
-        elif self.variant == 'full':
-            features = self.df.iloc[idx][['perplexity', 'grammar_errors', 'word_count', 
-                                          'urgency_score', 'authority_score', 'fear_score']].values.astype(np.float32)
-            item['extra_features'] = torch.tensor(features)
-            
+
         return item
 
-def train_model(variant, train_loader, val_loader, device, epochs=3):
-    print(f"\n--- Training Variant: {variant.upper()} ---")
-    
-    num_extra_features = 0
-    if variant == 'behavioral' or variant == 'psychological':
-        num_extra_features = 3
-    elif variant == 'full':
-        num_extra_features = 6
-        
+def train_model(variant, train_loader, val_loader, device, seed, epochs=3):
+    print(f"\n--- Training Variant: {variant.upper()} | seed {seed} ---")
+
+    num_extra_features = len(VARIANT_FEATURES[variant])
     model = PhishingDistilBERT(num_extra_features=num_extra_features).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5, weight_decay=0.01)
     criterion = torch.nn.BCEWithLogitsLoss()
@@ -135,39 +148,61 @@ def train_model(variant, train_loader, val_loader, device, epochs=3):
         if f1 > best_f1:
             best_f1 = f1
             os.makedirs('saved_models', exist_ok=True)
-            torch.save(model.state_dict(), f'saved_models/model_{variant}.pt')
+            torch.save(model.state_dict(), f'saved_models/model_{variant}_seed{seed}.pt')
             print("  --> Model saved!")
+    return best_f1
+
 
 def main():
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--variants', default=','.join(VARIANT_FEATURES.keys()),
+                    help="comma list; default all 7 variants")
+    ap.add_argument('--seeds', default='0,1,2,3,4', help="comma list of seeds")
+    ap.add_argument('--epochs', type=int, default=3)
+    ap.add_argument('--train', default='data/train_features.csv')
+    ap.add_argument('--val', default='data/val_features.csv')
+    args = ap.parse_args()
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu')
     print(f"Using device: {device}")
-    
-    tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-uncased')
-    
-    # Check if feature files exist
-    if not os.path.exists('data/train_features.csv'):
-        print("Feature files not found! Please run extract_features.py on the datasets first.")
-        return
-        
-    variants = ['baseline', 'behavioral', 'psychological', 'full']
-    
-    for variant in variants:
-        # Fit scaler on training data, then reuse it for val (prevents data leakage)
-        feature_cols = ['perplexity', 'grammar_errors', 'word_count', 
-                        'urgency_score', 'fear_score', 'authority_score']
-        train_df_raw = pd.read_csv('data/train_features.csv').fillna(0)
-        available = [c for c in feature_cols if c in train_df_raw.columns]
-        scaler = StandardScaler()
-        if available:
-            scaler.fit(train_df_raw[available])
 
-        train_dataset = PhishingDataset('data/train_features.csv', tokenizer, variant=variant, scaler=scaler)
-        val_dataset = PhishingDataset('data/val_features.csv', tokenizer, variant=variant, scaler=scaler)
-        
-        train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True, num_workers=2, pin_memory=True)
-        val_loader = DataLoader(val_dataset, batch_size=32, num_workers=2, pin_memory=True)
-        
-        train_model(variant, train_loader, val_loader, device, epochs=3)
+    tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-uncased')
+
+    if not os.path.exists(args.train):
+        print(f"{args.train} not found! Run extract_features.py first.")
+        return
+
+    variants = [v.strip() for v in args.variants.split(',')]
+    seeds = [int(s) for s in args.seeds.split(',')]
+
+    # Scaler is fit once on the training features and reused for val (no leakage).
+    feature_cols = ['perplexity', 'grammar_errors', 'word_count',
+                    'urgency_score', 'fear_score', 'authority_score']
+    train_df_raw = pd.read_csv(args.train).fillna(0)
+    available = [c for c in feature_cols if c in train_df_raw.columns]
+    scaler = StandardScaler()
+    if available:
+        scaler.fit(train_df_raw[available])
+
+    summary = []
+    for seed in seeds:
+        for variant in variants:
+            set_seed(seed)
+            train_dataset = PhishingDataset(args.train, tokenizer, variant=variant, scaler=scaler)
+            val_dataset = PhishingDataset(args.val, tokenizer, variant=variant, scaler=scaler)
+
+            g = torch.Generator(); g.manual_seed(seed)
+            train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True,
+                                      num_workers=2, pin_memory=True, generator=g)
+            val_loader = DataLoader(val_dataset, batch_size=32, num_workers=2, pin_memory=True)
+
+            best_f1 = train_model(variant, train_loader, val_loader, device, seed, epochs=args.epochs)
+            summary.append({'variant': variant, 'seed': seed, 'best_val_f1': best_f1})
+            pd.DataFrame(summary).to_csv('train_summary.csv', index=False)
+
+    print("\nTraining complete. Summary written to train_summary.csv")
+
 
 if __name__ == "__main__":
     main()

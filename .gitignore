@@ -16,3 +16,18 @@ saved_models/
 *.bin
 *.safetensors
 *.zip
+
+# Generated matched-pair data (regenerate with generate_mpg.py; keep out of git while large/dual-use)
+mpg_emails.csv
+mpg_attempts.csv
+mpg_features.csv
+mpg_audit_sheet.csv
+mpg_audit_key.csv
+mpg_valid*.csv
+*_audit.csv
+*_valid.csv
+*_valid_features.csv
+predictions_long.csv
+tfidf_predictions_long.csv
+tfidf_learning_curve.csv
+train_summary.csv

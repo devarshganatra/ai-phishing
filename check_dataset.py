@@ -1,61 +1,54 @@
+import os
 import pandas as pd
-import re
+from text_quality import is_refusal, placeholder_count
 
-def check_dataset(filepath):
+
+def check_dataset(filepath, features_path=None):
+    """Flag refusals and placeholders without touching the source file.
+
+    Writes:
+      <name>_audit.csv          every row with is_refusal / n_placeholders / is_exact_dup flags
+      <name>_valid.csv          rows that are real emails (not refusals)
+      <name>_valid_features.csv same filter applied to the features file, if given
+    """
     df = pd.read_csv(filepath)
+    df['row_id'] = range(len(df))
+    df['is_refusal'] = df['text'].apply(is_refusal)
+    df['n_placeholders'] = df['text'].apply(placeholder_count)
+    df['is_exact_dup'] = df.duplicated(subset=['text'], keep='first')
+
+    group_col = 'generator_model' if 'generator_model' in df.columns else None
     print(f"Total samples: {len(df)}")
-    
-    # 1. Check for outright refusals
-    refusal_keywords = [
-        "I cannot", "I am unable", "As an AI", "I'm sorry, but", 
-        "ethical guidelines", "I cannot fulfill", "against my programming"
-    ]
-    
-    refusals = 0
-    refusal_samples = []
-    valid_rows = []
-    
-    # 2. Check for placeholders
-    placeholder_pattern = r"\[.*?link.*?\]|<.*?link.*?>"
-    placeholders = 0
-    
-    for idx, row in df.iterrows():
-        text = str(row['text'])
-        
-        # Check refusals
-        is_refusal = False
-        for kw in refusal_keywords:
-            if kw.lower() in text.lower():
-                is_refusal = True
-                break
-        
-        if is_refusal:
-            refusals += 1
-            if len(refusal_samples) < 3:
-                refusal_samples.append(text)
+    if group_col:
+        summary = df.groupby(group_col).agg(
+            n=('text', 'size'),
+            unique_texts=('text', 'nunique'),
+            refusals=('is_refusal', 'sum'),
+            with_placeholders=('n_placeholders', lambda s: int((s > 0).sum())),
+        )
+        summary['valid'] = summary['n'] - summary['refusals']
+        print(summary.to_string())
+    print(f"\nRefusals: {int(df['is_refusal'].sum())}  |  "
+          f"Rows with placeholders: {int((df['n_placeholders'] > 0).sum())}  |  "
+          f"Valid emails: {int((~df['is_refusal']).sum())}")
+
+    base = os.path.splitext(filepath)[0]
+    df.to_csv(f'{base}_audit.csv', index=False)
+    valid = df[~df['is_refusal']]
+    valid.to_csv(f'{base}_valid.csv', index=False)
+    print(f"\nSaved {base}_audit.csv and {base}_valid.csv ({len(valid)} rows)")
+
+    if features_path and os.path.exists(features_path):
+        feats = pd.read_csv(features_path)
+        if len(feats) != len(df) or not (feats['text'].values == df['text'].values).all():
+            print(f"Warning: {features_path} rows do not line up with {filepath}; skipping features filter.")
         else:
-            valid_rows.append(row)
-                
-        # Check placeholders
-        if re.search(placeholder_pattern, text, re.IGNORECASE):
-            placeholders += 1
-            
-    print(f"\n--- Analysis Results ---")
-    print(f"Total Outright Refusals (Guardrails triggered): {refusals} ({(refusals/len(df))*100:.2f}%)")
-    print(f"Emails containing placeholders (e.g. [Insert Link]): {placeholders} ({(placeholders/len(df))*100:.2f}%)")
-    
-    # Save the cleaned dataset
-    clean_df = pd.DataFrame(valid_rows)
-    clean_df.to_csv(filepath, index=False)
-    print(f"\nSaved cleaned dataset with {len(clean_df)} valid samples back to {filepath}")
-    
-    if refusals > 0:
-        print("\n--- Examples of Refusals ---")
-        for i, sample in enumerate(refusal_samples):
-            print(f"\nExample {i+1}:")
-            print("-" * 40)
-            # Print first 200 chars of the refusal
-            print(sample[:200] + "...")
+            feats = feats.assign(row_id=df['row_id'], is_refusal=df['is_refusal'],
+                                 n_placeholders=df['n_placeholders'])
+            out = f'{base}_valid_features.csv'
+            feats[~feats['is_refusal']].to_csv(out, index=False)
+            print(f"Saved {out}")
+
 
 if __name__ == "__main__":
-    check_dataset('ai_heldout_test.csv')
+    check_dataset('ai_heldout_test.csv', features_path='ai_heldout_test_features.csv')
