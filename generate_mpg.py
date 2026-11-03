@@ -24,8 +24,10 @@ import argparse
 import os
 import random
 import sys
+import threading
 import time
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 
 import pandas as pd
@@ -33,6 +35,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 import scenarios
+from rate_limiter import RateLimiter
 from text_quality import (is_refusal, jaccard, normalize_quotes,
                           placeholder_count, shingles, strip_reasoning)
 
@@ -85,15 +88,20 @@ def get_client(provider):
     return _clients[provider]
 
 
-def call_model(gen_id, system_prompt, user_prompt):
-    """gen_id is 'provider:model'. Returns (status, text, raw_len)."""
+def call_model(gen_id, system_prompt, user_prompt, limiter=None):
+    """gen_id is 'provider:model'. Returns (status, text, raw_len).
+
+    When a limiter is given, it is acquired before each attempt (pacing) and updated from the
+    response's rate-limit headers afterward; a 429 waits for the limiter's header-aware backoff.
+    """
     provider, model = gen_id.split(':', 1)
     client = get_client(provider)
     extras = MODEL_EXTRAS.get(model, {})
-    delay = 2
-    for attempt in range(4):
+    for attempt in range(5):
+        if limiter:
+            limiter.acquire()
         try:
-            resp = client.chat.completions.create(
+            raw_resp = client.chat.completions.with_raw_response.create(
                 model=model,
                 messages=[{'role': 'system', 'content': system_prompt},
                           {'role': 'user', 'content': user_prompt}],
@@ -101,6 +109,9 @@ def call_model(gen_id, system_prompt, user_prompt):
                 max_completion_tokens=MAX_TOKENS,
                 extra_body=extras,
             )
+            if limiter:
+                limiter.update(raw_resp.headers)
+            resp = raw_resp.parse()
             raw = resp.choices[0].message.content or ''
             return 'ok', strip_reasoning(raw), len(raw)
         except Exception as e:
@@ -108,8 +119,11 @@ def call_model(gen_id, system_prompt, user_prompt):
             if 'quota' in msg or 'insufficient' in msg:
                 return 'quota', str(e), 0
             if 'rate limit' in msg or '429' in msg:
-                time.sleep(delay)
-                delay *= 2
+                hdrs = getattr(getattr(e, 'response', None), 'headers', None)
+                if limiter:
+                    limiter.backoff_429(hdrs)
+                else:
+                    time.sleep(2 * (attempt + 1))
                 continue
             return 'error', str(e), 0
     return 'error', 'max retries', 0
@@ -155,62 +169,95 @@ def accept_or_reject(text, reject_placeholders=False):
     later; pass reject_placeholders=True to drop them at generation time instead.
     """
     text = normalize_quotes(text).strip()
-    if len(text.split()) < 10:
-        return False, 'too_short', 0
+    # Refusal is checked before length: refusals are short, and mislabeling them 'too_short'
+    # would corrupt the per-generator refusal rate (a planned result).
     if is_refusal(text):
         return False, 'refusal', 0
+    if len(text.split()) < 10:
+        return False, 'too_short', 0
     n_ph = placeholder_count(text)
     if reject_placeholders and n_ph > 0:
         return False, 'placeholder', n_ph
     return True, 'ok', n_ph
 
 
-def stage_generate(generators, per_cell, conditions, polite_sleep, reject_placeholders=False):
+def stage_generate(generators, per_cell, conditions, reject_placeholders=False, min_interval=None):
+    """Generate the grid with one worker thread per model.
+
+    Parallelism is ACROSS models: each model's calls are serialized through its own
+    RateLimiter (so its free-tier limits are respected), but the four models run at the same
+    time, so total wall time is bounded by the slowest model rather than their sum. Shared
+    state (the output files and the dedup set) is guarded by locks.
+    """
     counts, seen = load_done()
-    attempts, accepted = [], []
-    quota_blocked = set()
-    try:
-        for gen in generators:
-            for sidx in range(scenarios.NUM_SCENARIOS):
-                for cond in conditions:
-                    if gen in quota_blocked:
+    write_lock = threading.Lock()
+    seen_lock = threading.Lock()
+    limiters = {}
+    for gen in generators:
+        lim = RateLimiter(gen.split(':', 1)[1])
+        if min_interval is not None:
+            lim.min_interval = max(lim.min_interval, min_interval)
+        limiters[gen] = lim
+
+    def worker(gen):
+        limiter = limiters[gen]
+        local_acc, local_att = [], []
+
+        def flush():
+            with write_lock:
+                append_rows(EMAILS_FILE, local_acc, EMAIL_COLS)
+                append_rows(ATTEMPTS_FILE, local_att, ATTEMPT_COLS)
+            local_acc.clear()
+            local_att.clear()
+
+        for sidx in range(scenarios.NUM_SCENARIOS):
+            for cond in conditions:
+                need = max(0, per_cell - counts.get((gen, sidx, cond), 0))
+                tries = 0
+                consec_refusals = 0
+                accepted_here = 0
+                while need > 0 and tries < per_cell * 4:
+                    tries += 1
+                    # A model that refuses this condition outright (e.g. gpt-oss-120b on phishing)
+                    # should not burn its daily quota retrying; bail after 5 straight refusals
+                    # with nothing accepted. The refusals are still logged for the refusal rate.
+                    if consec_refusals >= 5 and accepted_here == 0:
+                        print(f"  [refusing] {gen} scenario {sidx} {cond}: {consec_refusals} refusals, skipping cell.")
+                        break
+                    status, text, raw_len = call_model(
+                        gen, SYSTEM_PROMPT, scenarios.build_request(sidx, cond) + STYLE_RULES, limiter)
+                    if status == 'quota':
+                        local_att.append([gen, sidx, cond, 'quota', text[:120], raw_len, PROMPT_VERSION, now()])
+                        flush()
+                        print(f"  [quota] {gen} exhausted; stopping this model.")
+                        return
+                    if status == 'error':
+                        local_att.append([gen, sidx, cond, 'error', text[:120], raw_len, PROMPT_VERSION, now()])
                         continue
-                    have = counts.get((gen, sidx, cond), 0)
-                    need = max(0, per_cell - have)
-                    tries = 0
-                    while need > 0 and tries < per_cell * 4:
-                        tries += 1
-                        status, text, raw_len = call_model(
-                            gen, SYSTEM_PROMPT, scenarios.build_request(sidx, cond) + STYLE_RULES)
-                        if status == 'quota':
-                            print(f"  [quota] {gen} exhausted; moving on.")
-                            quota_blocked.add(gen)
-                            attempts.append([gen, sidx, cond, 'quota', text[:120], raw_len, PROMPT_VERSION, now()])
-                            break
-                        if status == 'error':
-                            attempts.append([gen, sidx, cond, 'error', text[:120], raw_len, PROMPT_VERSION, now()])
-                            time.sleep(polite_sleep)
-                            continue
-                        ok, reason, n_ph = accept_or_reject(text, reject_placeholders)
-                        if ok:
-                            sh = shingles(text)
+                    ok, reason, n_ph = accept_or_reject(text, reject_placeholders)
+                    consec_refusals = consec_refusals + 1 if reason == 'refusal' else 0
+                    if ok:
+                        sh = shingles(text)
+                        with seen_lock:
                             if any(jaccard(sh, s) > 0.8 for s in seen):
-                                reason, ok = 'duplicate', False
-                        attempts.append([gen, sidx, cond, 'ok' if ok else 'reject', reason, raw_len, PROMPT_VERSION, now()])
-                        if ok:
-                            seen.append(sh)
-                            accepted.append([str(uuid.uuid4()), gen, sidx, cond, LABELS[cond],
-                                             normalize_quotes(text).strip(), n_ph, '', '', PROMPT_VERSION, now()])
-                            counts[(gen, sidx, cond)] = counts.get((gen, sidx, cond), 0) + 1
-                            need -= 1
-                        time.sleep(polite_sleep)
-                        if len(accepted) >= 20:
-                            append_rows(EMAILS_FILE, accepted, EMAIL_COLS); accepted = []
-                            append_rows(ATTEMPTS_FILE, attempts, ATTEMPT_COLS); attempts = []
-            print(f"[done] {gen}")
-    finally:
-        append_rows(EMAILS_FILE, accepted, EMAIL_COLS)
-        append_rows(ATTEMPTS_FILE, attempts, ATTEMPT_COLS)
+                                ok, reason = False, 'duplicate'
+                            else:
+                                seen.append(sh)
+                    local_att.append([gen, sidx, cond, 'ok' if ok else 'reject', reason, raw_len, PROMPT_VERSION, now()])
+                    if ok:
+                        local_acc.append([str(uuid.uuid4()), gen, sidx, cond, LABELS[cond],
+                                          normalize_quotes(text).strip(), n_ph, '', '', PROMPT_VERSION, now()])
+                        need -= 1
+                        accepted_here += 1
+                        if len(local_acc) >= 20:
+                            flush()
+        flush()
+        print(f"[done] {gen}")
+
+    with ThreadPoolExecutor(max_workers=len(generators)) as ex:
+        futures = {ex.submit(worker, g): g for g in generators}
+        for fut in futures:
+            fut.result()
     stage_status()
 
 
@@ -221,6 +268,7 @@ def stage_rewrite(rewriter, per_source):
     base = df[df['condition'].isin(['P', 'B_hard'])]
     existing = set(df.get('source_sample_id', pd.Series(dtype=str)).dropna())
     accepted, attempts = [], []
+    limiter = RateLimiter(rewriter.split(':', 1)[1])
     for register, instruction in REWRITES.items():
         pool = base[~base['sample_id'].isin(existing)]
         sample = pool.groupby(['generator_model', 'condition'], group_keys=False).apply(
@@ -228,7 +276,7 @@ def stage_rewrite(rewriter, per_source):
         for _, r in sample.iterrows():
             status, text, raw_len = call_model(
                 rewriter, "You rewrite emails. Output only the rewritten email.",
-                instruction + "\n\n---\n" + str(r['text']))
+                instruction + "\n\n---\n" + str(r['text']), limiter)
             cond = r['condition'] + '_R'
             if status != 'ok':
                 attempts.append([rewriter, r['scenario_id'], cond, status, text[:120], raw_len, PROMPT_VERSION, now()])
@@ -295,7 +343,9 @@ def main():
     ap.add_argument('--per_cell', type=int, default=15, help="accepted emails per generator x scenario x condition")
     ap.add_argument('--per_source', type=int, default=8, help="rewrite: emails per generator x condition per register")
     ap.add_argument('--conditions', default='P,B_hard,B_easy')
-    ap.add_argument('--sleep', type=float, default=1.0)
+    ap.add_argument('--min_interval', type=float, default=None,
+                    help="floor (seconds) on the gap between calls, applied to every model on "
+                         "top of its per-model default in rate_limiter.RATE_LIMITS")
     ap.add_argument('--reject_placeholders', action='store_true',
                     help="drop emails containing [slot] placeholders instead of just flagging them")
     ap.add_argument('--n', type=int, default=60, help="audit_sheet size")
@@ -303,8 +353,8 @@ def main():
 
     if args.stage == 'generate':
         stage_generate([g.strip() for g in args.generators.split(',') if g.strip()],
-                       args.per_cell, [c.strip() for c in args.conditions.split(',')], args.sleep,
-                       reject_placeholders=args.reject_placeholders)
+                       args.per_cell, [c.strip() for c in args.conditions.split(',')],
+                       reject_placeholders=args.reject_placeholders, min_interval=args.min_interval)
     elif args.stage == 'rewrite':
         stage_rewrite(args.rewriter, args.per_source)
     elif args.stage == 'status':
