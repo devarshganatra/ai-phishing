@@ -73,9 +73,9 @@ def fig_collapse(mpg, preds, out):
     ax.bar(x - w/2, conv, w, label='Conventional test (P)', color=BLUE)
     ax.bar(x + w/2, mpgp, w, label='Matched-pair P', color=ORANGE)
     ax.set_xticks(x); ax.set_xticklabels(variants, rotation=30, ha='right')
-    ax.set_ylabel('Recall'); ax.set_ylim(0, 1.02)
+    ax.set_ylabel('Recall'); ax.set_ylim(0, 1.16); ax.set_yticks(np.linspace(0, 1, 6))
     ax.set_title('In-distribution vs matched-pair recall (the collapse, per variant)')
-    ax.legend()
+    ax.legend(loc='upper center', ncol=2, frameon=False)
     save(fig, out, 'fig_collapse.png')
 
 
@@ -93,9 +93,9 @@ def fig_H1_intent_auc(mpg, out):
     ax.bar(x + w/2, a_bh, w, label='AUC(P vs B_hard)  [intent]', color=RED)
     ax.axhline(0.5, color=GREY, ls='--', lw=1, label='chance')
     ax.set_xticks(x); ax.set_xticklabels(variants, rotation=30, ha='right')
-    ax.set_ylabel('AUC'); ax.set_ylim(0, 1.02)
+    ax.set_ylabel('AUC'); ax.set_ylim(0, 1.16); ax.set_yticks(np.linspace(0, 1, 6))
     ax.set_title('H1: can the detector read intent? (P vs matched benign twin)')
-    ax.legend()
+    ax.legend(loc='upper center', ncol=3, frameon=False)
     save(fig, out, 'fig_H1_intent_auc.png')
 
 
@@ -114,9 +114,9 @@ def fig_H2_register(mpg, out):
     ax.bar(x - w/2, rp, w, label='recall(P)', color=BLUE)
     ax.bar(x + w/2, rpr, w, label='recall(P_R)  [register changed]', color=ORANGE)
     ax.set_xticks(x); ax.set_xticklabels(variants, rotation=30, ha='right')
-    ax.set_ylabel('Recall'); ax.set_ylim(0, 1.02)
+    ax.set_ylabel('Recall'); ax.set_ylim(0, 1.16); ax.set_yticks(np.linspace(0, 1, 6))
     ax.set_title('H2: does rewriting the register (intent held constant) change detection?')
-    ax.legend()
+    ax.legend(loc='upper center', ncol=2, frameon=False)
     save(fig, out, 'fig_H2_register.png')
 
 
@@ -177,9 +177,9 @@ def fig_H4_false_alarm(mpg, out):
     ax.bar(x - w/2, be, w, label='FPR on B_easy', color=GREEN)
     ax.bar(x + w/2, bh, w, label='FPR on B_hard  [shared cues]', color=RED)
     ax.set_xticks(x); ax.set_xticklabels(variants, rotation=30, ha='right')
-    ax.set_ylabel('False-positive rate'); ax.set_ylim(0, 1.02)
+    ax.set_ylabel('False-positive rate'); ax.set_ylim(0, 1.16); ax.set_yticks(np.linspace(0, 1, 6))
     ax.set_title('H4: do benign twins with phishing-like cues trigger false alarms?')
-    ax.legend()
+    ax.legend(loc='upper center', ncol=2, frameon=False)
     save(fig, out, 'fig_H4_false_alarm.png')
 
 
