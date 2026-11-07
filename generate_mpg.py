@@ -54,13 +54,18 @@ PROVIDERS = {
     'mistral': ('https://api.mistral.ai/v1', 'MISTRAL_API_KEY'),
 }
 
+# Three Groq free-tier models that comply with phishing (P) prompts. allam and qwen refuse 0%;
+# gpt-oss-20b refuses ~21% (the harness retries to hit the target and logs the refusals, so this
+# only costs a few extra calls). gpt-oss-120b is excluded: it refuses ~62% and cannot form
+# complete P/B pairs. Add a generator from another provider (gemini:/openrouter:/...) to go beyond.
 DEFAULT_GENERATORS = [
     'groq:allam-2-7b',
     'groq:qwen/qwen3.8-27b',
     'groq:openai/gpt-oss-20b',
-    'groq:openai/gpt-oss-120b',
 ]
-DEFAULT_REWRITER = 'groq:openai/gpt-oss-120b'
+# A single fixed rewriter for the register stage; gpt-oss-20b follows the "keep intent, change
+# only style" instruction cleanly.
+DEFAULT_REWRITER = 'groq:openai/gpt-oss-20b'
 
 # Keep reasoning hidden/short so it cannot consume the token budget (the likely cause of the
 # original run keeping only 2/500 qwen emails).
@@ -271,8 +276,11 @@ def stage_rewrite(rewriter, per_source):
     limiter = RateLimiter(rewriter.split(':', 1)[1])
     for register, instruction in REWRITES.items():
         pool = base[~base['sample_id'].isin(existing)]
-        sample = pool.groupby(['generator_model', 'condition'], group_keys=False).apply(
-            lambda g: g.sample(min(len(g), per_source), random_state=42))
+        # Sample per (generator, condition) with a manual loop: pandas 3.0's groupby().apply()
+        # drops the grouping columns, which would lose 'condition'/'generator_model'.
+        parts = [g.sample(min(len(g), per_source), random_state=42)
+                 for _, g in pool.groupby(['generator_model', 'condition'])]
+        sample = pd.concat(parts) if parts else pool.iloc[0:0]
         for _, r in sample.iterrows():
             status, text, raw_len = call_model(
                 rewriter, "You rewrite emails. Output only the rewritten email.",

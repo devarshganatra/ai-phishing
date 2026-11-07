@@ -122,18 +122,25 @@ def extract_features(text):
 # ------------------------------------------------------------------
 CHECKPOINT_EVERY = 200
 
-def process_file(filepath, max_rows=None):
+def process_file(filepath, max_rows=None, output_path=None):
     print(f"\nProcessing: {filepath}")
     df = pd.read_csv(filepath)
 
-    # Fast demo mode: balanced class subsample
+    # Fast demo mode: balanced class subsample. Manual per-label loop because pandas 3.0's
+    # groupby().apply() drops the grouping column ('label'), which train.py needs.
     if max_rows is not None and max_rows < len(df):
         print(f"  Fast-mode: using {max_rows} rows out of {len(df)}")
-        df = df.groupby('label', group_keys=False).apply(
-            lambda x: x.sample(min(len(x), max_rows // 2), random_state=42)
-        ).reset_index(drop=True)
+        parts = [g.sample(min(len(g), max_rows // 2), random_state=42)
+                 for _, g in df.groupby('label')]
+        df = pd.concat(parts).reset_index(drop=True)
 
-    output_path     = filepath.replace('.csv', '_features.csv')
+    # Default writes next to the input, but when the input lives on a read-only mount
+    # (e.g. Kaggle's /kaggle/input), pass --output to a writable dir like /kaggle/working.
+    if output_path is None:
+        output_path = filepath.replace('.csv', '_features.csv')
+    out_dir = os.path.dirname(output_path)
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
     checkpoint_path = output_path + '.checkpoint.csv'
 
     # Resume from checkpoint if it exists
@@ -186,5 +193,8 @@ if __name__ == "__main__":
                         help="Input CSV file path (e.g. data/train.csv)")
     parser.add_argument('--max_rows', type=int, default=None,
                         help="Optional: subsample N balanced rows for a fast demo run")
+    parser.add_argument('--output', type=str, default=None,
+                        help="Output CSV path (default: alongside input). Use a writable dir "
+                             "like /kaggle/working/train_features.csv on read-only mounts.")
     args = parser.parse_args()
-    process_file(args.input, max_rows=args.max_rows)
+    process_file(args.input, max_rows=args.max_rows, output_path=args.output)

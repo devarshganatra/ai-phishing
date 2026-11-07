@@ -103,10 +103,34 @@ CSVs: `data/train_features.csv` (generate it first, see above), `data/val_featur
 ```bash
 pip install -q transformers
 
-# time one run first (7 variants x 5 seeds = 35 runs, ~3-4 min each on a T4, ~2 h total)
-python train.py --variants baseline,behavioral --seeds 0
+# time one run first (fp16/AMP is on automatically on a T4, ~2x faster than before)
+python train.py --train /kaggle/working/train_features.csv --val /kaggle/input/initial/val_features.csv \
+    --variants baseline,behavioral --seeds 0
+```
 
-# full matrix
+**Use BOTH T4s (Kaggle "GPU T4 x2").** The 35 runs (7 variants x 5 seeds) are independent, so
+instead of DataParallel (which gives ~no gain on a 66M-param model and muddies the seed-variance
+analysis) each GPU runs its own process over half the grid. In a single `!`-shell cell:
+
+```bash
+TRAIN=/kaggle/working/train_features.csv
+VAL=/kaggle/input/initial/val_features.csv
+VARS=baseline,perplexity,grammar,length,behavioral,psychological,full
+
+CUDA_VISIBLE_DEVICES=0 python train.py --shard 0 --num_shards 2 --train $TRAIN --val $VAL --variants $VARS --seeds 0,1,2,3,4 &
+CUDA_VISIBLE_DEVICES=1 python train.py --shard 1 --num_shards 2 --train $TRAIN --val $VAL --variants $VARS --seeds 0,1,2,3,4 &
+wait
+
+# merge the two per-shard summaries into one
+python -c "import pandas as pd, glob; pd.concat([pd.read_csv(f) for f in glob.glob('train_summary_shard*.csv')]).to_csv('train_summary.csv', index=False)"
+```
+
+Each shard writes its own `train_summary_shard{0,1}.csv` (no clobbering); checkpoints go to the
+shared `saved_models/`. AMP + both GPUs brings the full matrix from ~2 h down to roughly ~30 min.
+
+Single-GPU fallback (one card, or a different accelerator):
+
+```bash
 python train.py --variants baseline,perplexity,grammar,length,behavioral,psychological,full --seeds 0,1,2,3,4
 
 # per-email predictions for the paired tests (Kaggle test + matched-pair set)
@@ -116,8 +140,45 @@ python evaluate_predictions.py --inputs data/test_features.csv mpg_emails_featur
 python tfidf_baseline.py --inputs data/test_features.csv mpg_emails_features.csv --learning_curve
 ```
 
-Download `predictions_long.csv`, `tfidf_predictions_long.csv`, `train_summary.csv` back to the
-repo; the statistics (McNemar, paired bootstrap, cluster bootstrap) run locally on those dumps.
+Download `predictions_long.csv`, `tfidf_predictions_long.csv`, `train_summary.csv`,
+`mpg_emails_features.csv` and `tfidf_learning_curve.csv` back to the repo root.
 
 Checkpoints are named `saved_models/model_<variant>_seed<seed>.pt` and auto-discovered by
 `evaluate_predictions.py`.
+
+---
+
+## Analysis — tables and figures (local, runs on the downloaded dumps)
+
+Once the five files above are in the repo root, everything below runs in ~1 min on CPU. No model
+is re-run; the scripts read only the per-email dumps plus the matched-pair feature file.
+
+```bash
+# all hypothesis tests + result tables -> analysis_out/*.csv
+python analysis/paper_stats.py \
+    --preds predictions_long.csv --tfidf tfidf_predictions_long.csv \
+    --features mpg_emails_features.csv --out analysis_out
+
+# all publication figures -> analysis_out/*.png
+python analysis/paper_figures.py \
+    --preds predictions_long.csv --tfidf tfidf_predictions_long.csv \
+    --features mpg_emails_features.csv --train data/train.csv \
+    --learning_curve tfidf_learning_curve.csv --out analysis_out
+```
+
+What comes out, mapped to the reviewer's required items and the pre-registered hypotheses:
+
+| Output | Reviewer item | Hypothesis |
+|---|---|---|
+| `table_mpg_summary.csv`, `fig_H1_intent_auc.png` | matched counterfactual | H1 intent-blindness |
+| `table_register_effect.csv`, `fig_H2_register.png` | authorship vs dataset shift | H2 register-sensitivity |
+| `table_feature_authorship.csv`, `fig_H3_features.png`, `fig_H3_by_generator.png` | feature distributions | H3 authorship-not-intent |
+| `fig_H4_false_alarm.png`, `fig_tfidf_coef.png`, `table_tfidf_top_tokens.csv` | TF-IDF coefficient plot | H4 lexical false alarm |
+| `table_ablation_vs_baseline.csv`, `fig_ablation.png`, `fig_forest.png` | single-feature ablation + paired tests | — |
+| `table_recall_by_generator.csv`, `fig_heatmap.png` | per-generator TF-IDF/DistilBERT | — |
+| `table_conventional_by_seed.csv`, `table_seed_variance.csv` | ≥5 seeds, no-cost check | — |
+| `fig_collapse.png`, `fig_score_hist.png`, `fig_learning_curve.png` | learning curve, error diagnostics | — |
+
+Paired tests use **exact McNemar** (`scipy.stats.binomtest` on discordant pairs) and a **paired
+bootstrap** (2000 resamples) for recall differences with 95% CIs; the P↔P_R register pairs are
+reconstructed from `source_sample_id` in the feature file.

@@ -31,3 +31,11 @@ predictions_long.csv
 tfidf_predictions_long.csv
 tfidf_learning_curve.csv
 train_summary.csv
+
+# generated analysis outputs
+analysis_out/
+tfidf_learning_curve.csv
+
+# large regenerable feature files
+data/train_features.csv
+mpg_emails_features.csv
