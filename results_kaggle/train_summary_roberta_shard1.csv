@@ -1,0 +1,3 @@
+variant,seed,best_val_f1
+roberta,1,0.985373364126251
+roberta,3,0.9900383141762452

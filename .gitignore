@@ -39,3 +39,15 @@ tfidf_learning_curve.csv
 # large regenerable feature files
 data/train_features.csv
 mpg_emails_features.csv
+
+# macOS / Office clutter
+.DS_Store
+~$*
+
+# third-party benchmark data (download with kaggle/prep_ephishllm.py; do not redistribute)
+results_kaggle/ephishLLM.json
+results_kaggle/ephishllm_en.csv
+
+# audit sheets contain the generated email texts (dual-use; same policy as mpg_emails.csv)
+audit/*.xlsx
+audit/to_send/

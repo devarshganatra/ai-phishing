@@ -1,0 +1,17 @@
+Annotators: 2 (Annotator_A, Annotator_B); items: 90
+
+Agreement with the intended label (excluding "Cannot tell"):
+  Annotator_A: overall 0.867 | B_easy 1.000, B_hard 0.850, P 0.850 | cannot tell 0.000
+  Annotator_B: overall 0.878 | B_easy 0.700, B_hard 0.900, P 0.900 | cannot tell 0.000
+
+Cohen's kappa (verdict, 3 categories, n=90): 0.545; raw agreement 0.811
+
+B_hard twins (n=60): majority legitimate 0.800, unanimously legitimate 0.800, majority phishing 0.050
+Mean suspicion (1-5): P 4.17, B_hard 2.04, B_easy 1.95
+Ambiguous or disputed twins (12): E003, E005, E010, E022, E027, E036, E038, E054, E063, E083, E086, E088
+
+H1 sensitivity: AUC(all 450 P vs audited B_hard twins)
+  baseline    all 60 audited: 0.613 | unanimously legitimate only (n=48): 0.603
+  distilbert  all 60 audited: 0.628 | unanimously legitimate only (n=48): 0.616
+  roberta     all 60 audited: 0.667 | unanimously legitimate only (n=48): 0.651
+  tfidf       all 60 audited: 0.747 | unanimously legitimate only (n=48): 0.737

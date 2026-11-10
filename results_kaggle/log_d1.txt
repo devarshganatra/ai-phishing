@@ -1,0 +1,77 @@
+distilbert-base-uncased on cuda | shard 1/2 | seeds [1, 3]
+  scoring set test: 1754 emails
+  scoring set mpg_emails: 1446 emails
+  scoring set ephishllm: 11502 emails
+Loading weights:   0%|          | 0/100 [00:00<?, ?it/s]Loading weights: 100%|██████████| 100/100 [00:00<00:00, 7525.71it/s]
+[transformers] [1mDistilBertModel LOAD REPORT[0m from: distilbert-base-uncased
+Key                     | Status     |  | 
+------------------------+------------+--+-
+vocab_layer_norm.weight | UNEXPECTED |  | 
+vocab_projector.bias    | UNEXPECTED |  | 
+vocab_transform.bias    | UNEXPECTED |  | 
+vocab_transform.weight  | UNEXPECTED |  | 
+vocab_layer_norm.bias   | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+/kaggle/input/datasets/devarshganatra007/initial/train_backbone.py:123: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
+seed 1 epoch 1:   0%|          | 0/1098 [00:00<?, ?it/s]/kaggle/input/datasets/devarshganatra007/initial/train_backbone.py:130: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=use_amp):
+seed 1 epoch 1:   5%|▌         | 57/1098 [00:30<09:13,  1.88it/s]seed 1 epoch 1:   5%|▌         | 57/1098 [00:49<09:13,  1.88it/s]seed 1 epoch 1:  11%|█         | 117/1098 [01:00<08:24,  1.94it/s]seed 1 epoch 1:  11%|█         | 117/1098 [01:19<08:24,  1.94it/s]seed 1 epoch 1:  16%|█▌        | 178/1098 [01:30<07:46,  1.97it/s]seed 1 epoch 1:  16%|█▌        | 178/1098 [01:49<07:46,  1.97it/s]seed 1 epoch 1:  22%|██▏       | 239/1098 [02:01<07:11,  1.99it/s]seed 1 epoch 1:  22%|██▏       | 239/1098 [02:19<07:11,  1.99it/s]seed 1 epoch 1:  27%|██▋       | 300/1098 [02:31<06:39,  2.00it/s]seed 1 epoch 1:  27%|██▋       | 300/1098 [02:49<06:39,  2.00it/s]seed 1 epoch 1:  33%|███▎      | 361/1098 [03:01<06:08,  2.00it/s]seed 1 epoch 1:  33%|███▎      | 361/1098 [03:19<06:08,  2.00it/s]seed 1 epoch 1:  38%|███▊      | 422/1098 [03:32<05:37,  2.00it/s]seed 1 epoch 1:  38%|███▊      | 422/1098 [03:49<05:37,  2.00it/s]seed 1 epoch 1:  44%|████▍     | 482/1098 [04:02<05:08,  2.00it/s]seed 1 epoch 1:  44%|████▍     | 482/1098 [04:19<05:08,  2.00it/s]seed 1 epoch 1:  49%|████▉     | 543/1098 [04:32<04:36,  2.01it/s]seed 1 epoch 1:  49%|████▉     | 543/1098 [04:49<04:36,  2.01it/s]seed 1 epoch 1:  55%|█████▍    | 603/1098 [05:02<04:07,  2.00it/s]seed 1 epoch 1:  55%|█████▍    | 603/1098 [05:19<04:07,  2.00it/s]seed 1 epoch 1:  60%|██████    | 663/1098 [05:32<03:37,  2.00it/s]seed 1 epoch 1:  60%|██████    | 663/1098 [05:49<03:37,  2.00it/s]seed 1 epoch 1:  66%|██████▌   | 724/1098 [06:02<03:06,  2.01it/s]seed 1 epoch 1:  66%|██████▌   | 724/1098 [06:19<03:06,  2.01it/s]seed 1 epoch 1:  71%|███████▏  | 785/1098 [06:33<02:35,  2.01it/s]seed 1 epoch 1:  71%|███████▏  | 785/1098 [06:49<02:35,  2.01it/s]seed 1 epoch 1:  77%|███████▋  | 846/1098 [07:03<02:05,  2.01it/s]seed 1 epoch 1:  77%|███████▋  | 846/1098 [07:19<02:05,  2.01it/s]seed 1 epoch 1:  83%|████████▎ | 907/1098 [07:33<01:34,  2.01it/s]seed 1 epoch 1:  83%|████████▎ | 907/1098 [07:49<01:34,  2.01it/s]seed 1 epoch 1:  88%|████████▊ | 967/1098 [08:03<01:05,  2.01it/s]seed 1 epoch 1:  88%|████████▊ | 967/1098 [08:19<01:05,  2.01it/s]seed 1 epoch 1:  94%|█████████▎| 1028/1098 [08:34<00:34,  2.01it/s]seed 1 epoch 1:  94%|█████████▎| 1028/1098 [08:49<00:34,  2.01it/s]seed 1 epoch 1:  99%|█████████▉| 1089/1098 [09:04<00:04,  2.01it/s]seed 1 epoch 1: 100%|██████████| 1098/1098 [09:08<00:00,  2.00it/s]
+/kaggle/input/datasets/devarshganatra007/initial/train_backbone.py:64: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=use_amp):
+  seed 1 epoch 1: val F1 0.9839
+seed 1 epoch 2:   0%|          | 0/1098 [00:00<?, ?it/s]/kaggle/input/datasets/devarshganatra007/initial/train_backbone.py:130: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=use_amp):
+seed 1 epoch 2:   5%|▌         | 59/1098 [00:30<08:48,  1.97it/s]seed 1 epoch 2:   5%|▌         | 59/1098 [00:45<08:48,  1.97it/s]seed 1 epoch 2:  11%|█         | 120/1098 [01:00<08:10,  1.99it/s]seed 1 epoch 2:  11%|█         | 120/1098 [01:15<08:10,  1.99it/s]seed 1 epoch 2:  16%|█▋        | 181/1098 [01:30<07:38,  2.00it/s]seed 1 epoch 2:  16%|█▋        | 181/1098 [01:45<07:38,  2.00it/s]seed 1 epoch 2:  22%|██▏       | 242/1098 [02:00<07:06,  2.01it/s]seed 1 epoch 2:  22%|██▏       | 242/1098 [02:15<07:06,  2.01it/s]seed 1 epoch 2:  28%|██▊       | 303/1098 [02:31<06:36,  2.01it/s]seed 1 epoch 2:  28%|██▊       | 303/1098 [02:45<06:36,  2.01it/s]seed 1 epoch 2:  33%|███▎      | 364/1098 [03:01<06:05,  2.01it/s]seed 1 epoch 2:  33%|███▎      | 364/1098 [03:15<06:05,  2.01it/s]seed 1 epoch 2:  39%|███▊      | 425/1098 [03:32<05:35,  2.01it/s]seed 1 epoch 2:  39%|███▊      | 425/1098 [03:45<05:35,  2.01it/s]seed 1 epoch 2:  44%|████▍     | 486/1098 [04:02<05:04,  2.01it/s]seed 1 epoch 2:  44%|████▍     | 486/1098 [04:15<05:04,  2.01it/s]seed 1 epoch 2:  50%|████▉     | 547/1098 [04:32<04:33,  2.02it/s]seed 1 epoch 2:  50%|████▉     | 547/1098 [04:45<04:33,  2.02it/s]seed 1 epoch 2:  55%|█████▌    | 608/1098 [05:02<04:02,  2.02it/s]seed 1 epoch 2:  55%|█████▌    | 608/1098 [05:15<04:02,  2.02it/s]seed 1 epoch 2:  61%|██████    | 669/1098 [05:32<03:32,  2.02it/s]seed 1 epoch 2:  61%|██████    | 669/1098 [05:45<03:32,  2.02it/s]seed 1 epoch 2:  66%|██████▋   | 730/1098 [06:02<03:02,  2.02it/s]seed 1 epoch 2:  66%|██████▋   | 730/1098 [06:15<03:02,  2.02it/s]seed 1 epoch 2:  72%|███████▏  | 791/1098 [06:33<02:32,  2.02it/s]seed 1 epoch 2:  72%|███████▏  | 791/1098 [06:45<02:32,  2.02it/s]seed 1 epoch 2:  78%|███████▊  | 852/1098 [07:03<02:01,  2.02it/s]seed 1 epoch 2:  78%|███████▊  | 852/1098 [07:15<02:01,  2.02it/s]seed 1 epoch 2:  83%|████████▎ | 913/1098 [07:33<01:31,  2.02it/s]seed 1 epoch 2:  83%|████████▎ | 913/1098 [07:45<01:31,  2.02it/s]seed 1 epoch 2:  89%|████████▊ | 974/1098 [08:03<01:01,  2.02it/s]seed 1 epoch 2:  89%|████████▊ | 974/1098 [08:15<01:01,  2.02it/s]seed 1 epoch 2:  94%|█████████▍| 1035/1098 [08:33<00:31,  2.02it/s]seed 1 epoch 2:  94%|█████████▍| 1035/1098 [08:45<00:31,  2.02it/s]seed 1 epoch 2: 100%|█████████▉| 1096/1098 [09:04<00:00,  2.02it/s]seed 1 epoch 2: 100%|██████████| 1098/1098 [09:05<00:00,  2.01it/s]
+/kaggle/input/datasets/devarshganatra007/initial/train_backbone.py:64: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=use_amp):
+  seed 1 epoch 2: val F1 0.9870
+seed 1 epoch 3:   0%|          | 0/1098 [00:00<?, ?it/s]/kaggle/input/datasets/devarshganatra007/initial/train_backbone.py:130: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=use_amp):
+seed 1 epoch 3:   5%|▌         | 56/1098 [00:30<09:25,  1.84it/s]seed 1 epoch 3:   5%|▌         | 56/1098 [00:44<09:25,  1.84it/s]seed 1 epoch 3:  10%|█         | 111/1098 [01:00<08:57,  1.83it/s]seed 1 epoch 3:  10%|█         | 111/1098 [01:14<08:57,  1.83it/s]seed 1 epoch 3:  15%|█▌        | 166/1098 [01:30<08:28,  1.83it/s]seed 1 epoch 3:  15%|█▌        | 166/1098 [01:44<08:28,  1.83it/s]seed 1 epoch 3:  20%|██        | 222/1098 [02:00<07:57,  1.84it/s]seed 1 epoch 3:  20%|██        | 222/1098 [02:14<07:57,  1.84it/s]seed 1 epoch 3:  29%|██▉       | 317/1098 [02:30<05:37,  2.31it/s]seed 1 epoch 3:  29%|██▉       | 317/1098 [02:44<05:37,  2.31it/s]seed 1 epoch 3:  41%|████      | 452/1098 [03:01<03:32,  3.05it/s]seed 1 epoch 3:  41%|████      | 452/1098 [03:14<03:32,  3.05it/s]seed 1 epoch 3:  53%|█████▎    | 587/1098 [03:31<02:25,  3.51it/s]seed 1 epoch 3:  53%|█████▎    | 587/1098 [03:44<02:25,  3.51it/s]seed 1 epoch 3:  66%|██████▌   | 722/1098 [04:01<01:38,  3.82it/s]seed 1 epoch 3:  66%|██████▌   | 722/1098 [04:14<01:38,  3.82it/s]seed 1 epoch 3:  78%|███████▊  | 857/1098 [04:31<00:59,  4.02it/s]seed 1 epoch 3:  78%|███████▊  | 857/1098 [04:44<00:59,  4.02it/s]seed 1 epoch 3:  90%|█████████ | 992/1098 [05:01<00:25,  4.16it/s]seed 1 epoch 3:  90%|█████████ | 992/1098 [05:14<00:25,  4.16it/s]seed 1 epoch 3: 100%|██████████| 1098/1098 [05:25<00:00,  3.37it/s]
+/kaggle/input/datasets/devarshganatra007/initial/train_backbone.py:64: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=use_amp):
+/kaggle/input/datasets/devarshganatra007/initial/train_backbone.py:64: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=use_amp):
+  seed 1 epoch 3: val F1 0.9877
+  seed 1: scored test
+  seed 1: scored mpg_emails
+  seed 1: scored ephishllm
+Loading weights:   0%|          | 0/100 [00:00<?, ?it/s]Loading weights: 100%|██████████| 100/100 [00:00<00:00, 4848.29it/s]
+[transformers] [1mDistilBertModel LOAD REPORT[0m from: distilbert-base-uncased
+Key                     | Status     |  | 
+------------------------+------------+--+-
+vocab_layer_norm.weight | UNEXPECTED |  | 
+vocab_projector.bias    | UNEXPECTED |  | 
+vocab_transform.bias    | UNEXPECTED |  | 
+vocab_transform.weight  | UNEXPECTED |  | 
+vocab_layer_norm.bias   | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+/kaggle/input/datasets/devarshganatra007/initial/train_backbone.py:123: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
+seed 3 epoch 1:   0%|          | 0/1098 [00:00<?, ?it/s]/kaggle/input/datasets/devarshganatra007/initial/train_backbone.py:130: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=use_amp):
+seed 3 epoch 1:  12%|█▏        | 132/1098 [00:30<03:39,  4.40it/s]seed 3 epoch 1:  12%|█▏        | 132/1098 [00:45<03:39,  4.40it/s]seed 3 epoch 1:  24%|██▍       | 264/1098 [01:00<03:10,  4.38it/s]seed 3 epoch 1:  24%|██▍       | 264/1098 [01:15<03:10,  4.38it/s]seed 3 epoch 1:  36%|███▌      | 395/1098 [01:30<02:40,  4.37it/s]seed 3 epoch 1:  36%|███▌      | 395/1098 [01:45<02:40,  4.37it/s]seed 3 epoch 1:  48%|████▊     | 527/1098 [02:00<02:10,  4.37it/s]seed 3 epoch 1:  48%|████▊     | 527/1098 [02:15<02:10,  4.37it/s]seed 3 epoch 1:  60%|██████    | 659/1098 [02:30<01:40,  4.38it/s]seed 3 epoch 1:  60%|██████    | 659/1098 [02:45<01:40,  4.38it/s]seed 3 epoch 1:  72%|███████▏  | 791/1098 [03:00<01:10,  4.38it/s]seed 3 epoch 1:  72%|███████▏  | 791/1098 [03:15<01:10,  4.38it/s]seed 3 epoch 1:  84%|████████▍ | 923/1098 [03:30<00:39,  4.39it/s]seed 3 epoch 1:  84%|████████▍ | 923/1098 [03:45<00:39,  4.39it/s]seed 3 epoch 1:  96%|█████████▌| 1056/1098 [04:00<00:09,  4.40it/s]seed 3 epoch 1: 100%|██████████| 1098/1098 [04:10<00:00,  4.39it/s]
+  seed 3 epoch 1: val F1 0.9809
+seed 3 epoch 2:   0%|          | 0/1098 [00:00<?, ?it/s]/kaggle/input/datasets/devarshganatra007/initial/train_backbone.py:130: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=use_amp):
+seed 3 epoch 2:  12%|█▏        | 135/1098 [00:30<03:34,  4.48it/s]seed 3 epoch 2:  12%|█▏        | 135/1098 [00:47<03:34,  4.48it/s]seed 3 epoch 2:  24%|██▍       | 269/1098 [01:00<03:05,  4.47it/s]seed 3 epoch 2:  24%|██▍       | 269/1098 [01:17<03:05,  4.47it/s]seed 3 epoch 2:  37%|███▋      | 403/1098 [01:30<02:35,  4.46it/s]seed 3 epoch 2:  37%|███▋      | 403/1098 [01:47<02:35,  4.46it/s]seed 3 epoch 2:  49%|████▉     | 536/1098 [02:00<02:06,  4.45it/s]seed 3 epoch 2:  49%|████▉     | 536/1098 [02:17<02:06,  4.45it/s]seed 3 epoch 2:  61%|██████    | 670/1098 [02:30<01:36,  4.45it/s]seed 3 epoch 2:  61%|██████    | 670/1098 [02:47<01:36,  4.45it/s]seed 3 epoch 2:  73%|███████▎  | 805/1098 [03:00<01:05,  4.46it/s]seed 3 epoch 2:  73%|███████▎  | 805/1098 [03:17<01:05,  4.46it/s]seed 3 epoch 2:  86%|████████▌ | 940/1098 [03:30<00:35,  4.47it/s]seed 3 epoch 2:  86%|████████▌ | 940/1098 [03:47<00:35,  4.47it/s]seed 3 epoch 2:  98%|█████████▊| 1075/1098 [04:00<00:05,  4.47it/s]seed 3 epoch 2: 100%|██████████| 1098/1098 [04:05<00:00,  4.46it/s]
+/kaggle/input/datasets/devarshganatra007/initial/train_backbone.py:64: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=use_amp):
+  seed 3 epoch 2: val F1 0.9855
+seed 3 epoch 3:   0%|          | 0/1098 [00:00<?, ?it/s]/kaggle/input/datasets/devarshganatra007/initial/train_backbone.py:130: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=use_amp):
+seed 3 epoch 3:  12%|█▏        | 135/1098 [00:30<03:35,  4.48it/s]seed 3 epoch 3:  12%|█▏        | 135/1098 [00:44<03:35,  4.48it/s]seed 3 epoch 3:  25%|██▍       | 270/1098 [01:00<03:05,  4.47it/s]seed 3 epoch 3:  25%|██▍       | 270/1098 [01:14<03:05,  4.47it/s]seed 3 epoch 3:  37%|███▋      | 404/1098 [01:30<02:35,  4.47it/s]seed 3 epoch 3:  37%|███▋      | 404/1098 [01:44<02:35,  4.47it/s]seed 3 epoch 3:  49%|████▉     | 539/1098 [02:00<02:05,  4.47it/s]seed 3 epoch 3:  49%|████▉     | 539/1098 [02:14<02:05,  4.47it/s]seed 3 epoch 3:  61%|██████▏   | 674/1098 [02:30<01:34,  4.47it/s]seed 3 epoch 3:  61%|██████▏   | 674/1098 [02:44<01:34,  4.47it/s]seed 3 epoch 3:  74%|███████▎  | 809/1098 [03:00<01:04,  4.48it/s]seed 3 epoch 3:  74%|███████▎  | 809/1098 [03:14<01:04,  4.48it/s]seed 3 epoch 3:  86%|████████▌ | 944/1098 [03:30<00:34,  4.48it/s]seed 3 epoch 3:  86%|████████▌ | 944/1098 [03:44<00:34,  4.48it/s]seed 3 epoch 3:  98%|█████████▊| 1079/1098 [04:01<00:04,  4.48it/s]seed 3 epoch 3: 100%|██████████| 1098/1098 [04:05<00:00,  4.48it/s]
+/kaggle/input/datasets/devarshganatra007/initial/train_backbone.py:64: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=use_amp):
+/kaggle/input/datasets/devarshganatra007/initial/train_backbone.py:64: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with torch.cuda.amp.autocast(enabled=use_amp):
+  seed 3 epoch 3: val F1 0.9847
+  seed 3: scored test
+  seed 3: scored mpg_emails
+  seed 3: scored ephishllm
+done

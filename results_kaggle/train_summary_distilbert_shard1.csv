@@ -1,0 +1,3 @@
+variant,seed,best_val_f1
+distilbert,1,0.9877488514548239
+distilbert,3,0.9855072463768116

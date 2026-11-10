@@ -1,0 +1,69 @@
+n,key,doi,source,match,manuscript_title
+1,ferreira2015,10.1109/stast.2015.10,doi in text,,An analysis of social engineering principles in effective phishing
+2,fette2007,10.1145/1242572.1242660,doi in text,,Learning to detect phishing emails
+3,verma2012,10.1007/978-3-642-33167-1_47,doi in text,,Detecting phishing emails the natural language way
+4,vaswani2017,,manuscript (venue has no DOI),,Attention is all you need
+5,devlin2019,10.18653/v1/n19-1423,doi in text,,BERT: Pre-training of deep bidirectional transformers for language understanding
+6,sanh2019,10.48550/arXiv.1910.01108,doi in text,,"DistilBERT, a distilled version of BERT: Smaller, faster, cheaper and lighter"
+7,lee2020,10.48550/arXiv.2010.03484,doi in text,,CATBERT: Context-aware tiny BERT for detecting social engineering emails
+8,jamal2023,10.48550/arXiv.2311.04913,doi in text,,"An improved transformer-based model for detecting phishing, spam, and ham: A large language model approach"
+9,hazell2023,10.48550/arXiv.2305.06972,doi in text,,Spear phishing with large language models
+10,heiding2024,10.1109/ACCESS.2024.3375882,doi in text,,Devising and detecting phishing emails using large language models
+11,heiding2024b,10.48550/arXiv.2412.00586,doi in text,,Evaluating large language models' capability to launch fully automated spear phishing campaigns: Validated on human subjects
+12,bethany2025,10.1109/access.2025.3555500,doi in text,,Lateral phishing with large language models: A large organization comparative study
+13,qi2025,10.1016/j.inffus.2025.103176,doi in text,,SpearBot: Leveraging large language models in a generative-critique framework for spear-phishing email generation
+14,pajola2025,10.1145/3733799.3762967,doi in text,,E-PhishGen: Unlocking novel research in phishing email detection
+15,shahriar2022,10.33965/ict_wbc_eh2022_202204l016,doi in text,,Improving phishing detection via psychological trait scoring
+16,arp2022,,manuscript (venue has no DOI),,Dos and don'ts of machine learning in computer security
+17,koh2021,,manuscript (venue has no DOI),,WILDS: A benchmark of in-the-wild distribution shifts
+18,gardner2020,10.18653/v1/2020.findings-emnlp.117,doi in text,,Evaluating models' local decision boundaries via contrast sets
+19,kaushik2020,,manuscript (venue has no DOI),,Learning the difference that makes a difference with counterfactually-augmented data
+20,geirhos2020,10.1038/s42256-020-00257-z,doi in text,,Shortcut learning in deep neural networks
+21,biber1988variation,10.1017/CBO9780511621024,manual,,Variation across Speech and Writing
+22,cialdini2006influence,,manual,,Influence: The Psychology of Persuasion
+23,liu2019,10.48550/arXiv.1907.11692,doi in text,,RoBERTa: A robustly optimized BERT pretraining approach
+24,he2021,,manuscript (venue has no DOI),,DeBERTa: Decoding-enhanced BERT with disentangled attention
+25,mahendru2024,10.1109/bdai62182.2024.10692765,doi in text,,SecureNet: A comparative study of DeBERTa and large language models for phishing detection
+26,koide2025,10.1007/978-3-031-94455-0_14,doi in text,,ChatSpamDetector: Leveraging large language models for effective phishing email detection
+27,liu2025,10.48550/arXiv.2507.15393,doi in text,,PiMRef: Detecting and explaining ever-evolving spear phishing emails with knowledge base invariants
+28,kulal2025,10.48550/arXiv.2510.11915,doi in text,,"Robust ML-based detection of conventional, LLM-generated, and adversarial phishing emails using advanced text preprocessing"
+29,klimt2004,10.1007/978-3-540-30115-8_22,doi in text,,The Enron corpus: A new dataset for email classification research
+30,subaiey2024,10.1016/j.compeleceng.2024.109625,doi in text,,Novel interpretable and robust web-based AI platform for phishing email detection
+31,champa2024,10.1109/icmi60790.2024.10585821,doi in text,,Curated datasets and feature analysis for phishing email detection with machine learning
+32,mendes2025,10.1109/wi-iat67162.2025.00047,doi in text,,MeAJOR corpus: A multi-source dataset for phishing email detection
+33,verma2019,10.1145/3319535.3363267,doi in text,,"Data quality for security challenges: Case studies of phishing, malware and intrusion detection datasets"
+34,bhuiyan2026,10.3390/bdcc10070211,doi in text,,"The fragility of phishing detection models: Evidence from cross-corpus transfer, prevalence shift, artifact learning, and evasion risk"
+35,pendlebury2019,,manuscript (venue has no DOI),,TESSERACT: Eliminating experimental bias in malware classification across space and time
+36,sommer2010,10.1109/sp.2010.25,doi in text,,Outside the closed world: On using machine learning for network intrusion detection
+37,gururangan2018,10.18653/v1/n18-2017,doi in text,,Annotation artifacts in natural language inference data
+38,mccoy2019,10.18653/v1/p19-1334,doi in text,,Right for the wrong reasons: Diagnosing syntactic heuristics in natural language inference
+39,niven2019,10.18653/v1/p19-1459,doi in text,,Probing neural network comprehension of natural language arguments
+40,ribeiro2020,10.18653/v1/2020.acl-main.442,doi in text,,Beyond accuracy: Behavioral testing of NLP models with CheckList
+41,gehrmann2019,10.18653/v1/P19-3019,doi in text,,GLTR: Statistical detection and visualization of generated text
+42,ippolito2020,10.18653/v1/2020.acl-main.164,doi in text,,Automatic detection of generated text is easiest when humans are fooled
+43,mitchell2023,,manuscript (venue has no DOI),,DetectGPT: Zero-shot machine-generated text detection using probability curvature
+44,radford2019language,,manual,,Language models are unsupervised multitask learners
+45,sadasivan2023,10.48550/arXiv.2303.11156,doi in text,,Can AI-generated text be reliably detected
+46,krishna2023,10.52202/075280-1195,doi in text,,"Paraphrasing evades detectors of AI-generated text, but retrieval is an effective defense"
+47,liang2023,10.1016/j.patter.2023.100779,doi in text,,GPT detectors are biased against non-native English writers
+48,biber2009register,10.1017/CBO9780511814358,manual,,"Register, Genre, and Style"
+49,lemaitre2017,,manuscript (venue has no DOI),,Imbalanced-learn: A Python toolbox to tackle the curse of imbalanced datasets in machine learning
+50,bari2024,10.48550/arXiv.2407.15390,doi in text,,ALLaM: Large language models for Arabic and English
+51,groq2025allam,,manual,,ALLaM 2 7B
+52,yang2025,10.48550/arXiv.2505.09388,doi in text,,Qwen3 technical report
+53,groq2026qwen,,manual,,Qwen 3.8 27B
+54,openai2025gptoss,10.48550/arXiv.2508.10925,manual,,gpt-oss-120b & gpt-oss-20b model card
+55,languagetool,,manual,,"LanguageTool: Open-source grammar, style and spell checker"
+56,honnibal2020spacy,10.5281/zenodo.1212303,manual,,spaCy: Industrial-strength natural language processing in Python
+57,pedregosa2011,,manuscript (venue has no DOI),,Scikit-learn: Machine learning in Python
+58,loshchilov2019,,manuscript (venue has no DOI),,Decoupled weight decay regularization
+59,hanley1982,10.1148/radiology.143.1.7063747,doi in text,,The meaning and use of the area under a receiver operating characteristic (ROC) curve
+60,mcnemar1947,10.1007/bf02295996,doi in text,,Note on the sampling error of the difference between correlated proportions or percentages
+61,dietterich1998,10.1162/089976698300017197,doi in text,,Approximate statistical tests for comparing supervised classification learning algorithms
+62,efron1993bootstrap,10.1201/9780429246593,manual,,An Introduction to the Bootstrap
+63,holm1979,,manuscript (venue has no DOI),,A simple sequentially rejective multiple test procedure
+64,cohen1988statistical,10.4324/9780203771587,manual,,Statistical Power Analysis for the Behavioral Sciences
+65,dror2018,10.18653/v1/p18-1128,doi in text,,The hitchhiker's guide to testing statistical significance in natural language processing
+66,bouthillier2021,,manuscript (venue has no DOI),,Accounting for variance in machine learning benchmarks
+67,paszke2019,,manuscript (venue has no DOI),,"PyTorch: An imperative style, high-performance deep learning library"
+68,wolf2020,10.18653/v1/2020.emnlp-demos.6,doi in text,,Transformers: State-of-the-art natural language processing

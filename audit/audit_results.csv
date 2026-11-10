@@ -1,0 +1,91 @@
+item,condition,sample_id,generator,scenario,n_legit,n_phish,n_cannot,mean_suspicion,notes,majority,unanimous_legit
+E001,B_easy,e824f988-a742-4ed7-9786-61077ed6b915,,0,1,1,0,3.0,,No majority,False
+E002,B_hard,439eb674-b533-4b13-a296-4c4b1730396c,groq:openai/gpt-oss-20b,8,2,0,0,1.5,,Legitimate,True
+E003,B_hard,8e4aa5dd-c35a-4b3e-989a-9ef5cd167c6c,groq:qwen/qwen3.8-27b,5,1,1,0,3.5,,No majority,False
+E004,P,18838475-1d95-47c8-9b6a-f3d52dcfadb4,,9,0,2,0,4.5,,Phishing,False
+E005,B_hard,6f3a6cfc-9506-4948-a163-afb4ea3f7aeb,groq:qwen/qwen3.8-27b,8,1,1,0,3.5,,No majority,False
+E006,B_hard,973aa608-0ec7-4ceb-8716-71ab72af492c,groq:openai/gpt-oss-20b,6,2,0,0,2.0,,Legitimate,True
+E007,P,d669d65f-4099-45b8-bfe5-a159c78815a5,groq:allam-2-7b,4,1,1,0,3.0,,No majority,False
+E008,B_easy,b796fe58-3e70-42e1-a824-a9be5ffa070b,,1,2,0,0,1.5,,Legitimate,True
+E009,B_hard,7f87c58d-235f-493a-af51-e44fc6d3048f,groq:qwen/qwen3.8-27b,2,2,0,0,1.5,,Legitimate,True
+E010,B_hard,41e9b70c-ad04-453c-9303-58ef1b7543e3,groq:allam-2-7b,1,1,1,0,2.5,,No majority,False
+E011,P,54ab8a7d-5339-4f4b-9b4b-9a21b5b5e96f,,8,0,2,0,5.0,,Phishing,False
+E012,B_hard,f474503e-b6fc-4c46-b095-1c47e8ffdb00,groq:allam-2-7b,4,2,0,0,2.5,,Legitimate,True
+E013,B_hard,7a6ff545-111a-4278-b8fa-f1f750ef8872,groq:qwen/qwen3.8-27b,3,2,0,0,2.0,,Legitimate,True
+E014,B_hard,9b4a6856-d708-42de-ae3c-d0623ee90e3a,groq:allam-2-7b,5,2,0,0,2.0,,Legitimate,True
+E015,B_hard,49fd2c3c-b739-4504-ab3b-8d990599a242,groq:openai/gpt-oss-20b,5,2,0,0,1.5,,Legitimate,True
+E016,B_hard,7190966d-da97-4fcd-8fa2-b6b577670891,groq:allam-2-7b,7,2,0,0,2.5,,Legitimate,True
+E017,B_hard,968469fb-6a6f-47ab-8017-85cccb63ebbe,groq:allam-2-7b,8,2,0,0,1.5,,Legitimate,True
+E018,P,6799eed3-8bc9-42b4-84c3-f33149f0b79e,groq:openai/gpt-oss-20b,5,1,1,0,3.0,,No majority,False
+E019,B_hard,752b7dee-0783-4497-a3a9-5c99f5243ef2,groq:qwen/qwen3.8-27b,1,2,0,0,1.5,,Legitimate,True
+E020,P,937b4977-13fe-483f-904f-6af344fed24b,,5,0,2,0,4.5,,Phishing,False
+E021,P,444ed39b-58ad-4106-8de5-72604fb8d838,,6,0,2,0,4.5,,Phishing,False
+E022,B_hard,0aded3b2-b117-40b7-9300-21240c5af449,groq:openai/gpt-oss-20b,6,0,2,0,5.0,,Phishing,False
+E023,P,8ae4025c-6b3e-4636-9cb5-3fe28e50f488,,0,1,1,0,3.0,,No majority,False
+E024,B_hard,fb234533-8ce9-4d5e-a2da-216e9d822500,groq:allam-2-7b,6,2,0,0,1.0,,Legitimate,True
+E025,B_hard,4d97d683-19aa-4708-90e7-f5bedb9b2841,groq:qwen/qwen3.8-27b,3,2,0,0,1.0,,Legitimate,True
+E026,B_hard,19187bcc-00aa-47d7-ae0b-2f46034bfce1,groq:qwen/qwen3.8-27b,7,2,0,0,2.0,,Legitimate,True
+E027,B_hard,eef7b606-b46d-468d-873a-9637f19266b7,groq:allam-2-7b,0,1,1,0,3.5,,No majority,False
+E028,B_hard,c98c8fa0-d7a6-44e8-90a3-99e2cde2ec08,groq:allam-2-7b,3,2,0,0,1.5,,Legitimate,True
+E029,B_easy,13cf79fd-583a-4458-86eb-d071b51adadb,groq:allam-2-7b,2,2,0,0,1.0,,Legitimate,True
+E030,B_easy,157ccaea-2a26-4c70-a063-20ae3bdcfc3e,,1,2,0,0,1.5,,Legitimate,True
+E031,B_hard,5fb159a3-e857-48ea-a796-e1b5537bece2,groq:allam-2-7b,4,2,0,0,2.5,,Legitimate,True
+E032,B_easy,8aafb2e4-9e1f-4118-8e6e-2aacd10afacd,,2,2,0,0,1.5,,Legitimate,True
+E033,B_hard,f2a5c016-255e-4a63-b13e-dc812b6ebce2,groq:allam-2-7b,2,2,0,0,2.5,,Legitimate,True
+E034,B_easy,64fc422d-2c2c-42c8-a30c-7d3ccb0a1979,,9,2,0,0,1.0,,Legitimate,True
+E035,B_hard,dfe42e51-43e8-45e5-a429-fc5e2626dc41,groq:allam-2-7b,3,2,0,0,1.0,,Legitimate,True
+E036,B_hard,67a0ed40-500d-43dc-9f1d-3a4226db5b52,groq:qwen/qwen3.8-27b,1,1,1,0,3.5,,No majority,False
+E037,B_hard,51d4a15a-1dd7-484f-b431-9ee230335efe,groq:qwen/qwen3.8-27b,9,2,0,0,2.0,,Legitimate,True
+E038,B_hard,82c3a579-d841-49ae-9ad3-0983b8cf75ca,groq:allam-2-7b,0,1,1,0,3.5,,No majority,False
+E039,P,de4d986b-7e2e-4c0b-b445-740b6f2467f7,,8,0,2,0,4.5,,Phishing,False
+E040,B_hard,03125478-e353-43da-bcad-817ab7807ce2,groq:openai/gpt-oss-20b,4,2,0,0,1.0,,Legitimate,True
+E041,B_easy,9c40e7b7-60a9-4153-ae1e-9001c9e18289,,4,2,0,0,1.5,,Legitimate,True
+E042,P,90467131-0f2a-43b7-8612-5a896dd366f8,,6,0,2,0,4.5,,Phishing,False
+E043,B_hard,48720929-69dc-41b1-90bc-1e68c2f429cb,groq:qwen/qwen3.8-27b,0,2,0,0,1.5,,Legitimate,True
+E044,B_hard,2b5f6fb0-f389-41ef-90a4-e58f6afafb35,groq:qwen/qwen3.8-27b,4,2,0,0,1.5,,Legitimate,True
+E045,B_hard,08461e9e-66e5-420f-9b0b-4589e031cf4c,groq:allam-2-7b,7,2,0,0,2.0,,Legitimate,True
+E046,B_easy,176dcd22-2528-4d7d-98d5-f04b21955121,,1,1,1,0,4.0,,No majority,False
+E047,B_hard,a9aadc19-5ee3-4d22-b903-c60addae0f23,groq:openai/gpt-oss-20b,1,2,0,0,2.0,,Legitimate,True
+E048,P,4c7b7ad1-4a69-4dbb-bc30-43aa7e2bc6be,,4,0,2,0,4.5,,Phishing,False
+E049,P,575c1ad6-f2ce-4b54-8571-0a4c2dcd168c,,3,1,1,0,3.0,,No majority,False
+E050,P,e3f34716-01e1-424c-90c1-82843813710e,,8,0,2,0,4.5,,Phishing,False
+E051,B_hard,f32a5824-992f-4272-9e5a-3e9feab56e05,groq:qwen/qwen3.8-27b,9,2,0,0,1.5,,Legitimate,True
+E052,B_hard,d9766fb0-85bf-4736-8f6a-7c610299b8fb,groq:qwen/qwen3.8-27b,7,2,0,0,1.5,,Legitimate,True
+E053,B_hard,e46e459b-ae17-4f03-a60f-f3aafff8469f,groq:openai/gpt-oss-20b,5,2,0,0,1.0,,Legitimate,True
+E054,B_hard,81386e78-c97f-4ebc-a42d-b110d9c9ad1e,groq:openai/gpt-oss-20b,4,1,1,0,3.5,,No majority,False
+E055,B_easy,ce00f2f7-a347-482b-981e-9444807d0969,,1,1,1,0,3.5,,No majority,False
+E056,B_hard,d5c47219-709e-408d-9a72-5314db9db670,groq:openai/gpt-oss-20b,2,2,0,0,2.0,,Legitimate,True
+E057,P,1d905223-96b9-4ec8-bf70-63fc78b47a20,,6,1,1,0,3.0,,No majority,False
+E058,B_hard,bc3f489b-f1f5-4369-a64f-ede67eb1386b,groq:openai/gpt-oss-20b,7,2,0,0,1.0,,Legitimate,True
+E059,B_hard,0739ff54-0249-400f-a073-327ed40a8ec5,groq:openai/gpt-oss-20b,0,2,0,0,2.0,,Legitimate,True
+E060,B_hard,4d151058-aa19-4c8a-8ef3-3198eba7a946,groq:allam-2-7b,9,2,0,0,1.5,,Legitimate,True
+E061,B_hard,182568ad-8c10-4946-b1cf-d04b7aee5099,groq:qwen/qwen3.8-27b,6,2,0,0,2.5,,Legitimate,True
+E062,B_hard,d040c765-031e-4780-9086-4e999d8bd505,groq:openai/gpt-oss-20b,7,2,0,0,1.5,,Legitimate,True
+E063,B_hard,61f25b69-6b2a-4488-9322-b40bde0cbd02,groq:allam-2-7b,2,1,1,0,3.5,,No majority,False
+E064,P,6537f03b-b0b3-4915-ab75-4ecd1e4c46b3,,3,0,2,0,4.5,,Phishing,False
+E065,B_hard,4b461b5e-2261-47e4-ab3e-49b4dc1196f7,groq:allam-2-7b,1,2,0,0,1.5,,Legitimate,True
+E066,B_hard,7aed5fe0-8b43-4017-b32c-e79bbf7bc61a,groq:openai/gpt-oss-20b,0,2,0,0,2.5,,Legitimate,True
+E067,B_hard,24c9c99f-cb7b-42ff-957d-5780ec82b68e,groq:allam-2-7b,6,2,0,0,1.5,,Legitimate,True
+E068,B_hard,d1cd20cd-f288-4455-b73e-0b50e7c0b1b9,groq:openai/gpt-oss-20b,9,2,0,0,1.0,,Legitimate,True
+E069,P,8e231f01-daac-4961-b65f-db412bb40dce,,7,0,2,0,4.5,,Phishing,False
+E070,B_hard,f440e112-6cb6-48c2-bbec-f5076a656961,groq:allam-2-7b,8,2,0,0,1.5,,Legitimate,True
+E071,P,c333a712-f329-44b0-9b0a-bd08105d661a,,8,0,2,0,4.5,,Phishing,False
+E072,B_hard,6722bfc4-b702-45b2-9778-9b722f2f4341,groq:qwen/qwen3.8-27b,2,2,0,0,1.0,,Legitimate,True
+E073,B_hard,8441ac20-9f9c-47f5-a357-95219e338615,groq:openai/gpt-oss-20b,3,2,0,0,1.5,,Legitimate,True
+E074,B_hard,601e4aae-b7b2-46c3-bdab-60253fb8aab8,groq:qwen/qwen3.8-27b,8,2,0,0,2.5,,Legitimate,True
+E075,P,726f6ad9-ef21-4481-921f-b6f58fc24cf6,,8,0,2,0,5.0,,Phishing,False
+E076,P,b96425ba-5710-4147-b227-eb67c632454f,,9,0,2,0,4.5,,Phishing,False
+E077,B_easy,8116534e-8965-476f-ba16-7e699d59e049,,6,2,0,0,1.0,,Legitimate,True
+E078,P,a9e641d2-6cca-4bcd-b182-75eb9e41f092,,7,0,2,0,4.5,,Phishing,False
+E079,B_hard,93c041a7-1b47-4e48-97c0-e5796436d74b,groq:allam-2-7b,9,2,0,0,1.5,,Legitimate,True
+E080,B_hard,a0564539-a39c-47ec-92b7-7c62763f3ea4,groq:openai/gpt-oss-20b,9,2,0,0,1.0,,Legitimate,True
+E081,B_hard,a416d16d-33f3-4b8e-bf57-0cc7ac41f3f5,groq:openai/gpt-oss-20b,3,2,0,0,2.0,,Legitimate,True
+E082,B_hard,6bf15e89-b3f6-43a7-b4f1-f12e0de86484,groq:openai/gpt-oss-20b,2,2,0,0,1.5,,Legitimate,True
+E083,B_hard,b7252269-b742-464f-9c49-046f6da2261f,groq:openai/gpt-oss-20b,8,0,2,0,4.5,,Phishing,False
+E084,B_hard,ab44c0ef-c509-4402-a8cd-5042fd912307,groq:allam-2-7b,5,2,0,0,1.5,,Legitimate,True
+E085,B_hard,3b5b78e0-ca09-45fe-b289-de2158e43621,groq:openai/gpt-oss-20b,1,2,0,0,1.5,,Legitimate,True
+E086,B_hard,0b2672bc-9482-43ed-a957-eab9f294d125,groq:qwen/qwen3.8-27b,4,1,1,0,3.0,,No majority,False
+E087,B_hard,0228316e-fef5-4e64-bedd-ffe2045f2526,groq:qwen/qwen3.8-27b,5,2,0,0,1.0,,Legitimate,True
+E088,B_hard,a5d3634f-0abf-4baf-be8f-51ee444397a4,groq:qwen/qwen3.8-27b,6,0,2,0,4.0,,Phishing,False
+E089,B_hard,08dee24c-b162-422c-93a4-5506db84081c,groq:qwen/qwen3.8-27b,0,2,0,0,1.5,,Legitimate,True
+E090,P,95c2ea28-3a53-475d-89b8-959f9c6b81aa,,7,0,2,0,4.5,,Phishing,False
